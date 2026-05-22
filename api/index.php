@@ -2,7 +2,7 @@
 
 try {
     // Pastikan folder /tmp/cache dibuat terlebih dahulu untuk tempat menulis bootstrap cache Vercel
-    if (env('VERCEL') || isset($_SERVER['VERCEL'])) {
+    if (getenv('VERCEL') || isset($_SERVER['VERCEL'])) {
         if (!is_dir('/tmp/cache')) {
             mkdir('/tmp/cache', 0755, true);
         }
