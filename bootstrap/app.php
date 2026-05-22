@@ -17,9 +17,4 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// Gunakan folder /tmp hanya saat berjalan di lingkungan Vercel/Serverless
-if (env('VERCEL') || isset($_SERVER['VERCEL'])) {
-    $app->useStoragePath('/tmp');
-}
-
 return $app;
