@@ -1,6 +1,13 @@
 <?php
 
 try {
+    // Pastikan folder /tmp/cache dibuat terlebih dahulu untuk tempat menulis bootstrap cache Vercel
+    if (env('VERCEL') || isset($_SERVER['VERCEL'])) {
+        if (!is_dir('/tmp/cache')) {
+            mkdir('/tmp/cache', 0755, true);
+        }
+    }
+
     // Meneruskan request Vercel ke index.php bawaan Laravel
     require __DIR__ . '/../public/index.php';
 } catch (\Throwable $e) {
