@@ -1,15 +1,18 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.6.0"
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
-  },
-  "build": {
-    "env": {
-      "COMPOSER_MIRROR_PATH_REPOS": "1"
-    }
-  },
+  ],
   "routes": [
     {
       "src": "/build/(.*)",
