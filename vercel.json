@@ -11,7 +11,7 @@
           "bootstrap/**",
           "config/**",
           "database/**",
-          "resources/views/**",
+          "resources/**",
           "routes/**",
           "storage/**",
           "vendor/**",
