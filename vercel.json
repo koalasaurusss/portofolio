@@ -5,8 +5,17 @@
       "runtime": "vercel-php@0.6.0",
       "config": {
         "maxDuration": 10,
-        "memory": 1024
+        "memory": 1024,
+        "runtimeArgs": [
+          "-d", "extension=openssl",
+          "-d", "extension=mbstring"
+        ]
       }
+    }
+  },
+  "build": {
+    "env": {
+      "COMPOSER_MIRROR_PATH_REPOS": "1"
     }
   },
   "routes": [
