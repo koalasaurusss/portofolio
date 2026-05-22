@@ -5,7 +5,18 @@
       "src": "api/index.php",
       "use": "vercel-php@0.7.4",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "50mb",
+        "includeFiles": [
+          "app/**",
+          "bootstrap/**",
+          "config/**",
+          "database/**",
+          "resources/views/**",
+          "routes/**",
+          "storage/**",
+          "vendor/**",
+          "public/**"
+        ]
       }
     },
     {
