@@ -2,15 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.6.0",
-      "config": {
-        "maxDuration": 10,
-        "memory": 1024,
-        "runtimeArgs": [
-          "-d", "extension=openssl",
-          "-d", "extension=mbstring"
-        ]
-      }
+      "runtime": "vercel-php@0.6.0"
     }
   },
   "build": {
