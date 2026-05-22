@@ -10,6 +10,24 @@ document.addEventListener('mousemove', e => {
     cur.style.top = my + 'px';
 });
 
+document.addEventListener('touchmove', e => {
+    if (e.touches && e.touches[0]) {
+        mx = e.touches[0].clientX;
+        my = e.touches[0].clientY;
+        cur.style.left = mx + 'px';
+        cur.style.top = my + 'px';
+    }
+}, { passive: true });
+
+document.addEventListener('touchstart', e => {
+    if (e.touches && e.touches[0]) {
+        mx = e.touches[0].clientX;
+        my = e.touches[0].clientY;
+        cur.style.left = mx + 'px';
+        cur.style.top = my + 'px';
+    }
+}, { passive: true });
+
 function animRing() {
     rx += (mx - rx) * 0.12;
     ry += (my - ry) * 0.12;
