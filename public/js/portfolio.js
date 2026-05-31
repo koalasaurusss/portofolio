@@ -1,106 +1,210 @@
-// Custom Cursor
+// Custom Cursor Inertia Tracking (Desktop only)
 const cur = document.getElementById('cursor');
 const ring = document.getElementById('cursorRing');
 let mx = 0, my = 0, rx = 0, ry = 0;
 
-document.addEventListener('mousemove', e => {
-    mx = e.clientX;
-    my = e.clientY;
-    cur.style.left = mx + 'px';
-    cur.style.top = my + 'px';
-});
-
-document.addEventListener('touchmove', e => {
-    if (e.touches && e.touches[0]) {
-        mx = e.touches[0].clientX;
-        my = e.touches[0].clientY;
+if (cur && ring) {
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX;
+        my = e.clientY;
         cur.style.left = mx + 'px';
         cur.style.top = my + 'px';
-    }
-}, { passive: true });
+    });
 
-document.addEventListener('touchstart', e => {
-    if (e.touches && e.touches[0]) {
-        mx = e.touches[0].clientX;
-        my = e.touches[0].clientY;
-        cur.style.left = mx + 'px';
-        cur.style.top = my + 'px';
-    }
-}, { passive: true });
+    document.addEventListener('touchmove', e => {
+        if (e.touches && e.touches[0]) {
+            mx = e.touches[0].clientX;
+            my = e.touches[0].clientY;
+            cur.style.left = mx + 'px';
+            cur.style.top = my + 'px';
+        }
+    }, { passive: true });
 
-function animRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animRing);
+    document.addEventListener('touchstart', e => {
+        if (e.touches && e.touches[0]) {
+            mx = e.touches[0].clientX;
+            my = e.touches[0].clientY;
+            cur.style.left = mx + 'px';
+            cur.style.top = my + 'px';
+        }
+    }, { passive: true });
+
+    function animRing() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animRing);
+    }
+    animRing();
 }
-animRing();
 
-// Scroll — Back to Top button
+// Scroll — Back to Top button show/hide
 window.addEventListener('scroll', () => {
     const bt = document.getElementById('backTop');
-    bt.classList.toggle('show', scrollY > 400);
+    if (bt) {
+        if (window.scrollY > 400) {
+            bt.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none', 'scale-90');
+            bt.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto', 'scale-100');
+        } else {
+            bt.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none', 'scale-90');
+            bt.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto', 'scale-100');
+        }
+    }
 });
 
-// Intersection Observer for fade-up animations
+// Intersection Observer for fade-up animations and skill progress bars
 const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
         if (e.isIntersecting) {
             e.target.classList.add('visible');
             if (e.target.classList.contains('skill-category') || e.target.closest('.skill-category')) {
-                document.querySelectorAll('.skill-fill').forEach(f => {
+                const categoryEl = e.target.closest('.skill-category') || e.target;
+                categoryEl.querySelectorAll('.skill-fill').forEach(f => {
                     f.style.width = f.dataset.w + '%';
                 });
             }
         }
     });
-}, { threshold: 0.1 });
+}, { threshold: 0.05 });
 
 document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 document.querySelectorAll('.skill-category').forEach(el => obs.observe(el));
 
-// Project filter
+// Project category filtering
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.classList.remove('active', 'text-primary', 'bg-surface', 'shadow');
+            b.classList.add('text-on-surface-variant', 'hover:text-on-surface');
+        });
+        btn.classList.add('active', 'text-primary', 'bg-surface', 'shadow');
+        btn.classList.remove('text-on-surface-variant', 'hover:text-on-surface');
+        
         const cat = btn.dataset.cat;
         document.querySelectorAll('.project-card').forEach(card => {
             const show = cat === 'all' || card.dataset.cat === cat;
-            card.style.display = show ? '' : 'none';
+            if (show) {
+                card.style.display = '';
+                // Make sure it remains visible in scroll observer
+                card.classList.add('visible');
+            } else {
+                card.style.display = 'none';
+            }
         });
     });
 });
 
-// Form submit
+// Contact Form Submit Handler
 function handleSubmit() {
-    const n = document.getElementById('fname').value;
-    const e = document.getElementById('femail').value;
+    const n = document.getElementById('fname').value.trim();
+    const e = document.getElementById('femail').value.trim();
+    const s = document.getElementById('fsubject').value.trim();
+    const m = document.getElementById('fmessage').value.trim();
+    
     if (!n || !e) {
         alert('Please fill in your name and email first.');
         return;
     }
+    
     const toast = document.getElementById('toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4000);
+    if (toast) {
+        toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+        toast.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        setTimeout(() => {
+            toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+            toast.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+        }, 4000);
+    }
+    
     document.getElementById('fname').value = '';
     document.getElementById('femail').value = '';
     document.getElementById('fsubject').value = '';
     document.getElementById('fmessage').value = '';
 }
 
-// Trigger skill bars on load if visible
+// Trigger skill bars on load fallback (if already visible in viewport)
 setTimeout(() => {
     document.querySelectorAll('.skill-fill').forEach(f => {
-        f.style.width = f.dataset.w + '%';
+        if (f.getBoundingClientRect().top < window.innerHeight) {
+            f.style.width = f.dataset.w + '%';
+        }
     });
-}, 500);
+}, 400);
 
-// ==========================================
-// GOOGLE TRANSLATE — Language Switcher
-// ==========================================
+// ====================================================
+// Theme Switcher Sync (Desktop & Mobile)
+// ====================================================
+(function() {
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeIconMobile = document.getElementById('themeIconMobile');
 
+    function applyTheme(theme) {
+        if (theme === 'light') {
+            html.classList.remove('dark');
+            if (themeIcon) themeIcon.textContent = 'light_mode';
+            if (themeIconMobile) themeIconMobile.textContent = 'light_mode';
+        } else {
+            html.classList.add('dark');
+            if (themeIcon) themeIcon.textContent = 'dark_mode';
+            if (themeIconMobile) themeIconMobile.textContent = 'dark_mode';
+        }
+    }
+
+    // Set initial theme state
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    function toggleTheme() {
+        const isDark = html.classList.contains('dark');
+        const nextTheme = isDark ? 'light' : 'dark';
+        localStorage.setItem('theme', nextTheme);
+        applyTheme(nextTheme);
+    }
+
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+    if (themeToggleMobile) themeToggleMobile.addEventListener('click', toggleTheme);
+})();
+
+// ====================================================
+// Collapsible Mobile Menu Navigation
+// ====================================================
+(function() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuIcon = document.getElementById('menuIcon');
+
+    if (mobileMenuBtn && mobileMenu && menuIcon) {
+        mobileMenuBtn.addEventListener('click', () => {
+            const isOpen = mobileMenu.classList.contains('menu-open');
+            if (isOpen) {
+                mobileMenu.classList.remove('menu-open');
+                mobileMenu.style.maxHeight = '0px';
+                menuIcon.textContent = 'menu';
+            } else {
+                mobileMenu.classList.add('menu-open');
+                mobileMenu.style.maxHeight = '420px';
+                menuIcon.textContent = 'close';
+            }
+        });
+
+        // Auto close mobile list on item click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('menu-open');
+                mobileMenu.style.maxHeight = '0px';
+                menuIcon.textContent = 'menu';
+            });
+        });
+    }
+})();
+
+// ====================================================
+// GOOGLE TRANSLATE — Searchable Multi-language Selection
+// ====================================================
 function googleTranslateElementInit() {
     new google.translate.TranslateElement({
         pageLanguage: 'en',
@@ -109,39 +213,63 @@ function googleTranslateElementInit() {
     }, 'google_translate_element');
 }
 
-// Language Switcher UI Logic
 (function() {
-    const switcher = document.getElementById('langSwitcher');
-    const btn = document.getElementById('langBtn');
     const dropdown = document.getElementById('langDropdown');
+    const btn = document.getElementById('langBtn');
+    const btnMobile = document.getElementById('langBtnMobile');
     const search = document.getElementById('langSearch');
     const langList = document.getElementById('langList');
     const flagEl = document.getElementById('langFlag');
     const nameEl = document.getElementById('langName');
+    const flagElMobile = document.getElementById('langFlagMobile');
+    const nameElMobile = document.getElementById('langNameMobile');
 
-    if (!switcher) return;
+    if (!dropdown || !langList) return;
 
-    // Toggle dropdown
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        switcher.classList.toggle('open');
-        if (switcher.classList.contains('open')) {
-            setTimeout(() => search.focus(), 100);
+    // Toggle dropdown (Desktop)
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+
+    // Toggle dropdown (Mobile button maps to the same shared element)
+    if (btnMobile) {
+        btnMobile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+
+    function toggleDropdown() {
+        const isOpen = dropdown.classList.contains('pointer-events-auto');
+        if (isOpen) {
+            closeDropdown();
+        } else {
+            dropdown.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+            dropdown.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
+            setTimeout(() => search.focus(), 150);
         }
-    });
+    }
 
-    // Close on outside click
+    function closeDropdown() {
+        dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+        dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+        search.value = '';
+        filterLangs('');
+    }
+
+    // Close on click outside
     document.addEventListener('click', (e) => {
-        if (!switcher.contains(e.target)) {
-            switcher.classList.remove('open');
-            search.value = '';
-            filterLangs('');
+        if (!dropdown.contains(e.target) && (!btn || !btn.contains(e.target)) && (!btnMobile || !btnMobile.contains(e.target))) {
+            closeDropdown();
         }
     });
 
-    // Search filter
+    // Language Search Filters
     search.addEventListener('input', () => {
-        filterLangs(search.value.toLowerCase());
+        filterLangs(search.value.toLowerCase().trim());
     });
 
     function filterLangs(query) {
@@ -151,7 +279,7 @@ function googleTranslateElementInit() {
         });
     }
 
-    // Language selection
+    // Select Language Option
     langList.addEventListener('click', (e) => {
         const opt = e.target.closest('.lang-option');
         if (!opt) return;
@@ -160,20 +288,22 @@ function googleTranslateElementInit() {
         const flag = opt.dataset.flag;
         const name = opt.dataset.name;
 
-        // Update UI
-        langList.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
-        opt.classList.add('active');
-        flagEl.textContent = flag;
-        nameEl.textContent = name;
+        // Reset all states
+        langList.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active', 'text-primary'));
+        opt.classList.add('active', 'text-primary');
 
-        // Close dropdown
-        switcher.classList.remove('open');
-        search.value = '';
-        filterLangs('');
+        // Sync desktop indicators
+        if (flagEl) flagEl.textContent = flag;
+        if (nameEl) nameEl.textContent = name;
+        
+        // Sync mobile indicators
+        if (flagElMobile) flagElMobile.textContent = flag;
+        if (nameElMobile) nameElMobile.textContent = name;
 
-        // Trigger Google Translate
+        closeDropdown();
+
+        // Fire Google Translation
         if (lang === '') {
-            // Reset to English (original)
             resetTranslation();
         } else {
             triggerGoogleTranslate(lang);
@@ -181,7 +311,6 @@ function googleTranslateElementInit() {
     });
 
     function triggerGoogleTranslate(lang) {
-        // Wait for Google Translate to be ready
         const maxAttempts = 30;
         let attempts = 0;
 
@@ -199,7 +328,6 @@ function googleTranslateElementInit() {
     }
 
     function resetTranslation() {
-        // Remove Google Translate cookie to reset
         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.' + window.location.hostname;
 
@@ -212,34 +340,23 @@ function googleTranslateElementInit() {
                 return;
             }
         }
-        // Fallback: reload page
         window.location.reload();
     }
 
-    // Keyboard navigation
-    btn.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            btn.click();
-        }
-    });
-
-    // Escape to close
+    // Escape keyboard key to dismiss
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            switcher.classList.remove('open');
-            search.value = '';
-            filterLangs('');
-        }
+        if (e.key === 'Escape') closeDropdown();
     });
 
-    // Continuously hide Google Translate bar
+    // Continuously hide legacy Google Translate panel header bars
     const hideGoogleBar = () => {
-        const frames = document.querySelectorAll('.goog-te-banner-frame');
-        frames.forEach(f => f.style.display = 'none');
+        document.querySelectorAll('.goog-te-banner-frame').forEach(f => f.style.display = 'none');
         document.body.style.top = '0px';
-        const skips = document.querySelectorAll('.skiptranslate');
-        skips.forEach(s => { if (s.tagName !== 'DIV' || !s.querySelector('#google_translate_element')) s.style.display = 'none'; });
+        document.querySelectorAll('.skiptranslate').forEach(s => {
+            if (s.tagName !== 'DIV' || !s.querySelector('#google_translate_element')) {
+                s.style.display = 'none';
+            }
+        });
     };
 
     setInterval(hideGoogleBar, 500);
