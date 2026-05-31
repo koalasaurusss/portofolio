@@ -95,7 +95,7 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     });
 });
 
-// Contact Form Submit Handler
+// Contact Form Submit Handler — Send via WhatsApp
 function handleSubmit() {
     const n = document.getElementById('fname').value.trim();
     const e = document.getElementById('femail').value.trim();
@@ -107,6 +107,22 @@ function handleSubmit() {
         return;
     }
     
+    if (!m) {
+        alert('Please write a message.');
+        return;
+    }
+
+    // Build WhatsApp message
+    const waNumber = '6285247681878'; // +62 852-4768-1878
+    let waMessage = `Halo, saya menghubungi dari portfolio website Anda.\n\n`;
+    waMessage += `*Nama:* ${n}\n`;
+    waMessage += `*Email:* ${e}\n`;
+    if (s) waMessage += `*Subject:* ${s}\n`;
+    waMessage += `\n*Pesan:*\n${m}`;
+
+    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
+    
+    // Show toast notification
     const toast = document.getElementById('toast');
     if (toast) {
         toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
@@ -117,6 +133,10 @@ function handleSubmit() {
         }, 4000);
     }
     
+    // Open WhatsApp in new tab
+    window.open(waUrl, '_blank');
+    
+    // Clear form fields
     document.getElementById('fname').value = '';
     document.getElementById('femail').value = '';
     document.getElementById('fsubject').value = '';
